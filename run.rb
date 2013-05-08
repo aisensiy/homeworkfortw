@@ -1,16 +1,6 @@
 require_relative './lib/hotel'
 require_relative './lib/input_processor'
 
-def read_from_stdin
-  ARGF.read.split("\n")
-end
-
-def calculate_total_price(hotel, user, days)
-  days.map do |day|
-    hotel.price(:user_type => user, :day_of_week => day)
-  end.inject {|sum, x| sum + x}
-end
-
 def prepare_hotels
   [
     Hotel.new(:name => "Lakewood", :rating => 3, :strategies => {
@@ -32,7 +22,16 @@ def prepare_hotels
       "rewards weekend" => 40
     })
   ]
+end
 
+def read_from_stdin
+  ARGF.read.split("\n")
+end
+
+def calculate_total_price(hotel, user, days)
+  days.map do |day|
+    hotel.price(:user_type => user, :day_of_week => day)
+  end.inject {|sum, x| sum + x}
 end
 
 def run

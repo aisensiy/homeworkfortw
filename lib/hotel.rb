@@ -11,7 +11,7 @@ class Hotel
     @strategies = args[:strategies]
 
     if name.nil? or rating.nil? or strategies.nil?
-      raise "no name and no rating"
+      raise "parameters are invalid"
     end
   end
 

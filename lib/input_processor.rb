@@ -33,7 +33,7 @@ class InputProcessor
   end
 
   def parse_day_in_week(date)
-    pn = /(\d+)([a-zA-Z]+(\d{4})\((?<day_in_week>[a-zA-Z]+)\))/
+    pn = /(?<day>\d+)(?<month>[a-zA-Z]+)(?<year>\d{4})\((?<day_in_week>[a-zA-Z]+)\)/
     result = pn.match date
     if result.nil?
       raise "invalid input #{date}"
