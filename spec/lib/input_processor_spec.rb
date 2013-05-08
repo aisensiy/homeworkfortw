@@ -12,17 +12,15 @@ describe InputProcessor do
 
   context "#parse" do
     it "should return and hash with user_type of string and days of string array" do
-      result = subject.parse valid_input
-      result[:user_type].should == "Regular"
-      result[:days].should be_instance_of(Array)
-      result[:days].should == ["mon", "tues", "wed"]
-    end
+      subject.parse(valid_input).should == {
+        :user_type => "Regular",
+        :days => ["mon", "tues", "wed"]
+      }
+   end
 
-    it "should be nil of days" do
+    it "should raise error with invalid value" do
       input = "Regular: 16Mar2009(mon), 17Mar2009(tues), 18Mar2009wed)"
-      result = subject.parse input
-      result[:user_type].should == "Regular"
-      result[:days].should == ["mon", "tues", nil]
+      expect { subject.parse(input) }.to raise_error
     end
   end
 
@@ -40,10 +38,9 @@ describe InputProcessor do
       result[:dates].should == "16Mar2009(mon), 17Mar2009(tues), 18Mar2009(wed)"
     end
 
-    it "should be nil with invalid input" do
+    it "should raise error with invalid input" do
       invalid_input = "aba asdfsd"
-      result = subject.parse_user_type_and_dates invalid_input
-      result.should be_nil
+      expect { subject.parse_user_type_and_dates invalid_input }.to raise_error
     end
   end
 
@@ -65,8 +62,12 @@ describe InputProcessor do
       subject.parse_day_in_week(valid_input).should == "mon"
     end
 
-    it "should be nil with invalid input" do
-      subject.parse_day_in_week(invalid_input).should be_nil
+    it "should raise error with invalid input" do
+      expect { subject.parse_day_in_week(invalid_input) }.to raise_error
+    end
+
+    it "should raise error with invalid day in week" do
+      expect { subject.parse_day_in_week("16Mar2009(xxx)") }.to raise_error
     end
   end
 

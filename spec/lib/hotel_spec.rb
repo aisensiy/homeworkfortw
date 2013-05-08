@@ -4,12 +4,19 @@ require 'hotel'
 describe Hotel do
 
   subject do
-    Hotel.new "Lakewood", 3, {
+    Hotel.new :name => "Lakewood", :rating => 3, :strategies => {
       "regular weekday" => 110,
       "regular weekend" => 90,
       "rewards weekday" => 80,
       "rewards weekend" => 80
     }
+  end
+
+  context "basic attrs" do
+    its(:name) { should == "Lakewood" }
+    its(:rating) { should == 3 }
+    its(:strategies) { should be_instance_of(Hash) }
+    it { should respond_to(:price) }
   end
 
   context "#price" do
@@ -24,13 +31,6 @@ describe Hotel do
       subject.price({:user_type => "Rards", :day_of_week => "tues"}).should be_nil
       subject.price({:user_type => "Rewards", :day_of_week => "ues"}).should be_nil
     end
-  end
-
-  context "basic attrs" do
-    its(:name) { should == "Lakewood" }
-    its(:rating) { should == 3 }
-    its(:strategies) { should be_instance_of(Hash) }
-    it { should respond_to(:price) }
   end
 
   context "#user_type" do
@@ -60,6 +60,12 @@ describe Hotel do
       %w(adf afas cass).each do |day|
         subject.day_of_week(day).should be_nil
       end
+    end
+  end
+
+  context "test for special cases" do
+    it "raise error with no name and rating" do
+      expect { Hotel.new }.to raise_error
     end
   end
 

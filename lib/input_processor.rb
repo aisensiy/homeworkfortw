@@ -1,5 +1,8 @@
 class InputProcessor
 
+  WEEK = %w{mon tues wed thur fri sat sun}
+  USER_TYPE = %W(Regular Rewards)
+
   def parse(str)
     result = parse_user_type_and_dates(str)
     dates = dates_to_a(result[:dates])
@@ -7,7 +10,7 @@ class InputProcessor
       parse_day_in_week(d)
     end
 
-    {user_type: result[:user_type], days: days}
+    {:user_type => result[:user_type], :days => days}
   end
 
   private
@@ -15,9 +18,13 @@ class InputProcessor
     pn = /(?<user_type>[^:]+):\s*(?<dates>.+)/
     result = pn.match str
     if result.nil?
-      nil
+      raise 'invalid input ' + str
     else
-      {user_type: result[:user_type].strip, dates: result[:dates].strip}
+      user_type = result[:user_type].strip
+      if !USER_TYPE.include?(user_type)
+        raise "invalid input with wrong user type #{user_type}"
+      end
+      {:user_type => user_type, :dates => result[:dates].strip}
     end
   end
 
@@ -29,8 +36,11 @@ class InputProcessor
     pn = /(\d+)([a-zA-Z]+(\d{4})\((?<day_in_week>[a-zA-Z]+)\))/
     result = pn.match date
     if result.nil?
-      nil
+      raise "invalid input #{date}"
     else
+      if !WEEK.include? result[:day_in_week]
+        raise "invalid day of week #{date}"
+      end
       result[:day_in_week]
     end
   end
