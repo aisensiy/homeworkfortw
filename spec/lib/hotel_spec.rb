@@ -3,60 +3,63 @@ require 'hotel'
 
 describe Hotel do
 
-  subject {Hotel.new "Lakewood", 3}
+  subject do
+    Hotel.new "Lakewood", 3, {
+      "regular weekday" => 110,
+      "regular weekend" => 90,
+      "rewards weekday" => 80,
+      "rewards weekend" => 80
+    }
+  end
 
-  context "price" do
-    it "should == 100 with weekday and regular" do
-      subject.price("Regular", "mon").should == 110
-      subject.price("Regular", "sun").should == 90
-      subject.price("Rewards", "sun").should == 80
-      subject.price("Rewards", "tues").should == 80
+  context "#price" do
+    it "should get diff price depends on user and day" do
+      subject.price({:user_type => "Regular", :day_of_week => "mon"}).should == 110
+      subject.price({:user_type => "Regular", :day_of_week => "sun"}).should == 90
+      subject.price({:user_type => "Rewards", :day_of_week => "sun"}).should == 80
+      subject.price({:user_type => "Rewards", :day_of_week => "tues"}).should == 80
+    end
+
+    it "get nil with wrong input" do
+      subject.price({:user_type => "Rards", :day_of_week => "tues"}).should be_nil
+      subject.price({:user_type => "Rewards", :day_of_week => "ues"}).should be_nil
     end
   end
 
   context "basic attrs" do
     its(:name) { should == "Lakewood" }
     its(:rating) { should == 3 }
+    its(:strategies) { should be_instance_of(Hash) }
     it { should respond_to(:price) }
   end
 
-  context "match day" do
-    let(:elsedays) { %w(abc dda monday)}
-
-    it "match sun and sat as weekend" do
-      Hotel::WEEKEND.each do |day|
-        subject.weekend?(day).should be_true
-      end
-
-      Hotel::WEEKDAY.each do |day|
-        subject.weekend?(day).should be_false
-      end
-
-      elsedays.each do |day|
-        subject.weekend?(day).should be_false
-      end
+  context "#user_type" do
+    it "get lower case of word" do
+      subject.user_type("Regular").should == "regular"
+      subject.user_type("Rewards").should == "rewards"
     end
 
-    it "match 1-5 day as weekday" do
-      Hotel::WEEKDAY.each do |day|
-        subject.weekday?(day).should be_true
-      end
-
-      Hotel::WEEKEND.each do |day|
-        subject.weekday?(day).should be_false
-      end
+    it "get nil if not in the USER_TYPE" do
+      subject.user_type("Test").should be_nil
     end
   end
 
-  context "match user type" do
-    it "match Regular is regular" do
-      subject.regular?("Regular").should be_true
-      subject.regular?("Rewards").should be_false
+  context "#day_of_week" do
+    it "get weekend if in WEEKEND" do
+      Hotel::WEEKEND.each do |day|
+        subject.day_of_week(day).should == 'weekend'
+      end
     end
+    it "get weekday if in WEEKDAY" do
+      Hotel::WEEKDAY.each do |day|
+        subject.day_of_week(day).should == 'weekday'
+      end
 
-    it "match Rewards is rewards" do
-      subject.rewards?("Rewards").should be_true
-      subject.rewards?("Regular").should be_false
+    end
+    it "else will be nil" do
+      %w(adf afas cass).each do |day|
+        subject.day_of_week(day).should be_nil
+      end
     end
   end
 
