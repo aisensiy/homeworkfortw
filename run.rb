@@ -41,11 +41,14 @@ def run
   hotels = prepare_hotels
 
   lines.each do |line|
-    begin
-      result = input_processor.parse(line)
-    rescue RuntimeError
-      return
-    end
+    result =
+      begin
+        input_processor.parse(line)
+      rescue RuntimeError
+        nil
+      end
+
+    next if result.nil?
 
     results = hotels.map do |hotel|
       total = calculate_total_price(hotel, result[:user_type], result[:days])
